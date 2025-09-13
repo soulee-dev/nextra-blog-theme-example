@@ -2,17 +2,17 @@ import { normalizePages } from "nextra/normalize-pages";
 import { getPageMap } from "nextra/page-map";
 
 type FrontMatter = {
-  title: string
-  description: string
-  date: string
-}
+  title: string;
+  description: string;
+  date: string;
+};
 
 type Post = {
-  name: string
-  route: string
-  frontMatter: FrontMatter
-  [key: string]: any
-}
+  name: string;
+  route: string;
+  frontMatter: FrontMatter;
+  [key: string]: any;
+};
 
 export async function getPosts() {
   const { directories } = normalizePages({
@@ -20,7 +20,7 @@ export async function getPosts() {
     route: "/posts",
   });
 
-  console.log("directories!!", directories)
+  console.log("directories!!", directories);
 
   return directories
     .filter((post) => post.name !== "index")
