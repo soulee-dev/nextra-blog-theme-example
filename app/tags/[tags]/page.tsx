@@ -1,8 +1,17 @@
 import { PostCard } from "nextra-theme-blog";
 import { getPosts, getTags } from "../../posts/get-posts";
 
-export async function generateMetadata(props) {
+type PageParams = {
+  tag: string
+}
+
+type PageProps = Readonly<{
+  params: PageParams
+}>
+
+export async function generateMetadata(props: PageProps) {
   const params = await props.params;
+
   return {
     title: `Posts Tagged with “${decodeURIComponent(params.tag)}”`,
   };
@@ -13,20 +22,20 @@ export async function generateStaticParams() {
   return [...new Set(allTags)].map((tag) => ({ tag }));
 }
 
-export default async function TagPage(props) {
+export default async function TagPage(props: PageProps) {
   const params = await props.params;
   const { title } = await generateMetadata({ params });
   const posts = await getPosts();
   return (
     <>
       <h1>{title}</h1>
-      {posts
+      {/* {posts
         .filter((post) =>
           post.frontMatter.tags.includes(decodeURIComponent(params.tag)),
         )
         .map((post) => (
           <PostCard key={post.route} post={post} />
-        ))}
+        ))} */}
     </>
   );
 }

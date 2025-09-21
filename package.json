@@ -15,7 +15,8 @@
     "nextra": "^4.4.0",
     "nextra-theme-blog": "^4.4.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",

@@ -1,18 +1,17 @@
 import { normalizePages } from "nextra/normalize-pages";
 import { getPageMap } from "nextra/page-map";
+import { z } from "zod";
 
-type FrontMatter = {
-  title: string;
-  description: string;
-  date: string;
-};
+const PostFrontMatterSchema = z.object({
+  date: z.string().refine((date) => !isNaN(Date.parse(date)), {
+    message: "date must be a valid date format"
+  }),
+  title: z.string().min(1, "title is required"),
+  description: z.string().optional(),
+  tags: z.array(z.string()).optional()
+});
 
-type Post = {
-  name: string;
-  route: string;
-  frontMatter: FrontMatter;
-  [key: string]: any;
-};
+type PostFrontMatter = z.infer<typeof PostFrontMatterSchema>
 
 export async function getPosts() {
   const { directories } = normalizePages({
@@ -20,13 +19,26 @@ export async function getPosts() {
     route: "/posts",
   });
 
-  console.log("directories!!", directories);
-
-  return directories
+  const validPosts = directories
     .filter((post) => post.name !== "index")
-    .sort(
-      (a, b) => new Date(b.frontMatter.date) - new Date(a.frontMatter.date),
-    );
+    .map((post) => {
+      try {
+        // Validate frontmatter using zod
+        const validatedFrontMatter = PostFrontMatterSchema.parse(post.frontMatter);
+        return {
+          ...post,
+          frontMatter: validatedFrontMatter
+        };
+      } catch (error) {
+        console.error(`Invalid frontmatter in ${post.name}:`, error);
+        return null;
+      }
+    })
+    .filter((post): post is NonNullable<typeof post> => post !== null);
+
+  return validPosts.sort(
+    (a, b) => new Date(b.frontMatter.date).getTime() - new Date(a.frontMatter.date).getTime()
+  );
 }
 
 export async function getTags() {
